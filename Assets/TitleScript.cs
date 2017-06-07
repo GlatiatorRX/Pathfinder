@@ -18,6 +18,24 @@ public class TitleScript : MonoBehaviour {
 
     bool titleGenerated = false;
     int menuSelected = 2;
+    int MenuSelected {
+        get { return menuSelected; }
+        set {
+            menuSelected = value;
+            if (value >= menuText.Length)
+            {
+                menuSelected = 2;
+            }
+            else if (value < 2)
+            {
+                menuSelected = menuText.Length - 1;
+            }
+            else
+            {
+                menuSelected = value;
+            }
+        }
+    }
 
     // Use this for initialization
     void Start () {
@@ -42,52 +60,33 @@ public class TitleScript : MonoBehaviour {
         {
             if (Input.GetKeyDown(KeyCode.UpArrow))
             {
-                menuSelected--;
+                MenuSelected--;
             }
             else if (Input.GetKeyDown(KeyCode.DownArrow))
             {
-                menuSelected++;
-            }
-            
-            if (menuSelected >= menuText.Length)
-            {
-                menuSelected = 2;
-            }
-            else if (menuSelected < 2)
-            {
-                menuSelected = menuText.Length - 1;
+                MenuSelected++;
             }
 
             var pointer = new PointerEventData(EventSystem.current);
-            ExecuteEvents.Execute(menuText[menuSelected].gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+            ExecuteEvents.Execute(menuText[MenuSelected].gameObject, pointer, ExecuteEvents.pointerEnterHandler);
         }
     }
 
     public void SelectMenuItem(int index)
     {
-        menuSelected = index;
-        if (menuSelected >= menuText.Length)
-        {
-            menuSelected = 2;
-        }
-        else if (menuSelected < 2)
-        {
-            menuSelected = menuText.Length - 1;
-        }
-
+        MenuSelected = index;
         var pointer = new PointerEventData(EventSystem.current);
         for (int i = 0; i < menuText.Length; i++)
         {
-            if (i != menuSelected)
+            if (i != MenuSelected)
             {
                 ExecuteEvents.Execute(menuText[i].gameObject, pointer, ExecuteEvents.pointerExitHandler);
             }
         }
-        carrot.transform.SetParent(menuText[menuSelected].transform);
+        carrot.transform.SetParent(menuText[MenuSelected].transform);
         carrot.rectTransform.anchoredPosition = new Vector2(0, 0);
     }
-
-    // Update is called once per frame
+    
     IEnumerator GenerateMenuItem() {
         int tries = 0;
         int index = 0;
@@ -134,7 +133,7 @@ public class TitleScript : MonoBehaviour {
                 menuText[menuIndex].text = sb.ToString();
                 yield return new WaitForSeconds(0.05f);
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.3f);
             index = 0;
             menuIndex++;
         }
@@ -148,7 +147,7 @@ public class TitleScript : MonoBehaviour {
                 menuText[i].GetComponent<Selectable>().enabled = true;
             }
         }
-        ExecuteEvents.Execute(menuText[menuSelected].gameObject, pointer, ExecuteEvents.pointerEnterHandler);
+        ExecuteEvents.Execute(menuText[MenuSelected].gameObject, pointer, ExecuteEvents.pointerEnterHandler);
 
         highlight.enabled = false;
         titleGenerated = true;
